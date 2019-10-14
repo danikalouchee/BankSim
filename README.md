@@ -7,3 +7,4 @@ https://trello.com/b/3uW4FWpi/banksim-board
 <img src="https://github.com/3296f19temple/05-kalouche_gorosko-K_M/blob/maxDevelop/UMLrace.png" alt="alt text" width="860" height="620" style="max-width:100%;">
 
 <img src="https://github.com/3296f19temple/05-kalouche_gorosko-K_M/blob/master/UMLrace.png" alt="master branch pic" width="240" height="410" style="max-width:100%;">
+
