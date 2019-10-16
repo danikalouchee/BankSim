@@ -1,5 +1,6 @@
 package edu.temple.cis.c3238.banksim;
 
+import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author Cay Horstmann
  * @author Modified by Paul Wolfgang
@@ -13,6 +14,7 @@ public class Bank {
     private long ntransacts = 0;
     private final int initialBalance;
     private final int numAccounts;
+    private final ReentrantLock r_lock = new ReentrantLock();
 
     public Bank(int numAccounts, int initialBalance) {
         this.initialBalance = initialBalance;
@@ -26,10 +28,17 @@ public class Bank {
 
     public void transfer(int from, int to, int amount) {
 //        accounts[from].waitForAvailableFunds(amount);
-        if (accounts[from].withdraw(amount)) {
-            accounts[to].deposit(amount);
+        r_lock.lock();
+        try {
+            if (accounts[from].withdraw(amount)) {
+                accounts[to].deposit(amount);
+            }
+            if (shouldTest()) {
+                test();
+            }
+        } finally {
+            r_lock.unlock();
         }
-        if (shouldTest()) test();
     }
 
     public void test() {
