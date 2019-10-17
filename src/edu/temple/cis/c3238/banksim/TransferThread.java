@@ -21,17 +21,16 @@ class TransferThread extends Thread {
 
     @Override
     public void run() {
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100; i++) {
             try{
-                semaphore.acquire();
+                semaphore.acquire(10);
             } catch(InterruptedException ex){
             }
             //System.out.println("TRANSFER THREAD ACQUIRE: " + semaphore.toString());
             int toAccount = (int) (bank.size() * Math.random());
             int amount = (int) (maxAmount * Math.random());
             bank.transfer(fromAccount, toAccount, amount);
-            System.out.println("Transferred "+amount+" from account "+ fromAccount+ " to account "+ toAccount);
-            semaphore.release();
+            semaphore.release(10);
             //System.out.println("TRANSFER THREAD RELEASE: " + semaphore.toString());
         }
     }
