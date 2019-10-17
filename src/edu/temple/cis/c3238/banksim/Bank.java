@@ -15,6 +15,8 @@ public class Bank {
     private final int initialBalance;
     private final int numAccounts;
     private final ReentrantLock r_lock = new ReentrantLock();
+    
+    private boolean open = true;
 
     public Bank(int numAccounts, int initialBalance) {
         this.initialBalance = initialBalance;
@@ -73,4 +75,22 @@ public class Bank {
         return ++ntransacts % NTEST == 0;
     }
 
+    
+    public synchronized boolean isOpen()
+    {
+        return open;
+    }
+    
+    
+    public synchronized void closeBank()
+    {
+        open = false;
+        for (Account account : accounts)
+        {
+            synchronized (account)
+            {
+                account.notifyAll();
+            }
+        }
+    }
 }
