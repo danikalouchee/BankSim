@@ -1,6 +1,5 @@
 package edu.temple.cis.c3238.banksim;
 
-import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author Cay Horstmann
  * @author Modified by Paul Wolfgang
@@ -13,6 +12,7 @@ public class Account {
     private final Bank myBank;
 
     public Account(Bank myBank, int id, int initialBalance) {
+        
         this.myBank = myBank;
         this.id = id;
         balance = initialBalance;
@@ -23,6 +23,7 @@ public class Account {
     }
 
     public synchronized boolean withdraw(int amount) {
+        
         if (amount <= balance) {
             int currentBalance = balance;
             Thread.yield(); // Try to force collision
@@ -33,25 +34,24 @@ public class Account {
             return false;
         }
     }
-    
-    public synchronized void waitForAvailableFunds(int amount){
-        boolean flag = false;
-        while(amount >= balance){
-            flag = true;
-            try{
-                wait();
-            }catch (InterruptedException ex){
-            }
-        }
-    }
 
     public synchronized void deposit(int amount) {
+        
         int currentBalance = balance;
         Thread.yield();   // Try to force collision
         int newBalance = currentBalance + amount;
         balance = newBalance;
-        
         notifyAll();
+        
+    }
+    
+    public synchronized void waitForAvailableFunds(int amount) {
+        
+        while (myBank.isOpen() && amount >= balance) {
+            try {
+                wait();
+            } catch (InterruptedException ex) { }
+        }
     }
     
     @Override
