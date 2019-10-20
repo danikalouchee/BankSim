@@ -1,4 +1,6 @@
 # BankSim
+Kalouche
+Goroshko
 
 We get a race condition during a transfer and summing up the account balances. 
 One thread is responsible fot adding up the sum of all the account balances. All the other threads keep transferring money between accounts.
