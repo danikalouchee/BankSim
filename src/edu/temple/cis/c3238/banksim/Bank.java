@@ -14,9 +14,12 @@ public class Bank {
     private long ntransacts = 0;
     private final int initialBalance;
     private final int numAccounts;
-    private final ReentrantLock r_lock = new ReentrantLock();
-
+    private boolean open = true;
+    public ReentrantLock bLock = new ReentrantLock();
+    
     public Bank(int numAccounts, int initialBalance) {
+        
+        open = true;
         this.initialBalance = initialBalance;
         this.numAccounts = numAccounts;
         accounts = new Account[numAccounts];
@@ -27,29 +30,36 @@ public class Bank {
     }
 
     public void transfer(int from, int to, int amount) {
-//        accounts[from].waitForAvailableFunds(amount);
-        r_lock.lock();
-        try {
-            if (accounts[from].withdraw(amount)) {
-                accounts[to].deposit(amount);
-            }
-            if (shouldTest()) {
-                test();
-            }
-        } finally {
-            r_lock.unlock();
+        
+        accounts[from].waitForAvailableFunds(amount);
+        if(!open)
+        {
+            return;
+        }
+        
+        bLock.lock();
+        if (accounts[from].withdraw(amount)) {
+            accounts[to].deposit(amount);
+        }
+        bLock.unlock();
+        
+        if(shouldTest())
+        {
+            test();
         }
     }
 
     public void test() {
+        
+        bLock.lock();
         int sum = 0;
-        r_lock.lock();
-        try{
             for (Account account : accounts) {
                 System.out.printf("%s %s%n", 
                         Thread.currentThread().toString(), account.toString());
                 sum += account.getBalance();
             }
+            bLock.unlock();
+            
             System.out.println(Thread.currentThread().toString() + 
                     " Sum: " + sum);
             if (sum != numAccounts * initialBalance) {
@@ -60,11 +70,6 @@ public class Bank {
                 System.out.println(Thread.currentThread().toString() + 
                         " The bank is in balance!");
             }
-        }
-        finally
-        {
-            r_lock.unlock();
-        }
     }
 
     public int size() {
@@ -76,4 +81,23 @@ public class Bank {
         return ++ntransacts % NTEST == 0;
     }
 
+    public synchronized boolean isOpen()
+    {
+        return open;
+    }
+    
+    public void closeBank()
+    {
+        synchronized (this)
+        {
+            open = false;
+        }
+        for(Account account : accounts)
+        {
+            synchronized(account)
+            {
+                account.notifyAll();
+            }
+        }
+    }
 }

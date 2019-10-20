@@ -12,6 +12,7 @@ public class Account {
     private final Bank myBank;
 
     public Account(Bank myBank, int id, int initialBalance) {
+        
         this.myBank = myBank;
         this.id = id;
         balance = initialBalance;
@@ -21,10 +22,11 @@ public class Account {
         return balance;
     }
 
-    public boolean withdraw(int amount) {
+    public synchronized boolean withdraw(int amount) {
+        
         if (amount <= balance) {
             int currentBalance = balance;
-//            Thread.yield(); // Try to force collision
+            Thread.yield(); // Try to force collision
             int newBalance = currentBalance - amount;
             balance = newBalance;
             return true;
@@ -33,11 +35,23 @@ public class Account {
         }
     }
 
-    public void deposit(int amount) {
+    public synchronized void deposit(int amount) {
+        
         int currentBalance = balance;
-//        Thread.yield();   // Try to force collision
+        Thread.yield();   // Try to force collision
         int newBalance = currentBalance + amount;
         balance = newBalance;
+        notifyAll();
+        
+    }
+    
+    public synchronized void waitForAvailableFunds(int amount) {
+        
+        while (myBank.isOpen() && amount >= balance) {
+            try {
+                wait();
+            } catch (InterruptedException ex) { }
+        }
     }
     
     @Override

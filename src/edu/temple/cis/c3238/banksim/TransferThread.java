@@ -10,28 +10,26 @@ class TransferThread extends Thread {
     private final Bank bank;
     private final int fromAccount;
     private final int maxAmount;
-    Semaphore semaphore = null;
 
-    public TransferThread(Bank b, int from, int max, Semaphore semaphore) {
+    public TransferThread(Bank b, int from, int max) {
+        
         bank = b;
         fromAccount = from;
         maxAmount = max;
-        this.semaphore = semaphore;
     }
 
     @Override
     public void run() {
-        for (int i = 0; i < 100; i++) {
-            try{
-                semaphore.acquire(10);
-            } catch(InterruptedException ex){
-            }
+        
+        for (int i = 0; i < 1000; i++) {
             //System.out.println("TRANSFER THREAD ACQUIRE: " + semaphore.toString());
             int toAccount = (int) (bank.size() * Math.random());
             int amount = (int) (maxAmount * Math.random());
             bank.transfer(fromAccount, toAccount, amount);
-            semaphore.release(10);
+
             //System.out.println("TRANSFER THREAD RELEASE: " + semaphore.toString());
+        
         }
+        bank.closeBank();
     }
 }
