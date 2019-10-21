@@ -22,6 +22,7 @@ Testing:
 We decided manual testing was the best method of testing for this project. We noticed after completing task two that the program ran for longer than it did when it had a race condition. The sum would display 10000 continuously for about a minute or so which was a lot longer than the previous build. We continued to check on how the project ran after each task was implemented. We ran into problems where only one thread will executed or the program would run into a deadlock and all threads were waiting for each other to continue. The print statements in the code helped us find and solve these errors when we came across them because we could see when what thread is running when. We knew the program was running correctly when the output had exactly 10 lines of account balance (account[0] to account[9]) and had a line where the sum equals 100000 along with the bank is in balance statement. 
 
 
+Updated UML:
 
 <img src="https://github.com/3296f19temple/05-kalouche_gorosko-K_M/blob/master/UMLrace.png" alt="master branch pic" width="240" height="410" style="max-width:100%;">
 
